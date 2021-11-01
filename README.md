@@ -1,2 +1,2 @@
-# nogometni klubovi
+# klubovi
 otvoreni skup podataka o nogometnim klubovima
