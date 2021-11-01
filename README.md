@@ -13,7 +13,7 @@ Skup podataka koristi MIT licencu. MIT licenca je kratka i jednostavna otvorena 
 | Naziv  | Nogometni klubovi     |
 | :--- | :--- |
 | Licenca     | [MIT License](https://opensource.org/licenses/MIT) |
-| Autor       | Josip Arelić (josip555@mail.com)|
+| Autor       | Josip Arelić (josip555@example-mail.com)|
 | Jezik | hrvatski |
 | Dostupni formati | CSV, JSON |
 | Format datuma | [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) (YYYY-MM-DD)|
