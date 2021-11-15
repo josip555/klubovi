@@ -2,7 +2,7 @@
 
 Dobrodošli u repozitorij otvorenih podataka o nogometnim klubovima.
 
-Ovaj kataloški skup podataka napravljen je u sklopu 1. laboratorijske vježbe predmeta Otvoreno računarstvo preddiplomskog i diplomskog studija Fakulteta elektrotehnike i računarstva u Zagrebu. 
+Ovaj kataloški skup podataka napravljen je u sklopu laboratorijskih vježbi predmeta Otvoreno računarstvo preddiplomskog i diplomskog studija Fakulteta elektrotehnike i računarstva u Zagrebu. Skupu je moguće pristupiti preko web-stranice čiji se izvorni kod nalazi u repozitoriju.
 
 Cilj ovog skupa podataka je pružiti podatke za pregled i analizu nogometnih klubova, igrača i stadiona na kojima ti klubovi igraju. Podaci su trenutno isključivo dostupni na hrvatskom jeziku u različitim formatima.
 

@@ -1,0 +1,24 @@
+{
+  "name": "klubovi",
+  "version": "1.0.0",
+  "description": "Dobrodošli u repozitorij otvorenih podataka o nogometnim klubovima.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/josip555/klubovi.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/josip555/klubovi/issues"
+  },
+  "homepage": "https://github.com/josip555/klubovi#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "pg": "^8.7.1"
+  }
+}

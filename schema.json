@@ -1,0 +1,220 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "http://localhost:3000/klubovi.json",
+    "type": "array",
+    "title": "Nogometni klubovi",
+    "description": "Skup nogometnih klubova.",
+    "items": [{
+        "type": "object",
+        "title": "Nogometni klub",
+        "description": "Objekt koji sadrži sve podatke o jednom nogometnom klubu.",
+        "required": [
+            "klub_naziv"
+        ],
+        "properties": {
+            "klub_naziv": {
+                "type": "string",
+                "title": "Naziv kluba",
+                "description": "Puno ime kluba.",
+                "default": "",
+                "examples": [
+                    "AC Milan"
+                ]
+            },
+            "kratica": {
+                "type": "string",
+                "title": "Skraćenica",
+                "description": "Skraćeni naziv kluba.",
+                "examples": [
+                    "MIL"
+                ]
+            },
+            "nadimak": {
+                "type": "string",
+                "title": "Nadimak",
+                "description": "Nadimak po kojem su klub ili njegova momčad poznati.",
+                "examples": [
+                    "I Rossoneri"
+                ]
+            },
+            "klub_grad": {
+                "type": "string",
+                "title": "Grad kluba",
+                "description": "Grad kojega klub predstavlja.",
+                "examples": [
+                    "Milano"
+                ]
+            },
+            "klub_drzava": {
+                "type": "string",
+                "title": "Država kluba",
+                "description": "Država koju klub predstavlja.",
+                "examples": [
+                    "Italija"
+                ]
+            },
+            "osnovan": {
+                "type": "string",
+                "format": "date",
+                "title": "Datum osnutka",
+                "description": "Datum osnutka kluba u ISO formatu.",
+                "examples": [
+                    "1899-12-16"
+                ]
+            },
+            "predsjednik": {
+                "type": "string",
+                "title": "Predsjednik kluba",
+                "description": "Puno ime predsjednika kluba.",
+                "examples": [
+                    "Paolo Scaroni"
+                ]
+            },
+            "trener": {
+                "type": "string",
+                "title": "Trener kluba",
+                "description": "Puno ime trenera kluba.",
+                "examples": [
+                    "Stefano Pioli"
+                ]
+            },
+            "liga": {
+                "type": "string",
+                "title": "Liga",
+                "description": "Liga u kojoj se klub natječe.",
+                "examples": [
+                    "Serie A"
+                ]
+            },
+            "web": {
+                "type": "string",
+                "format": "uri",
+                "title": "Web-stranica",
+                "description": "Poveznica na službenu web-stranicu kluba.",
+                "examples": [
+                    "https://www.acmilan.com/en"
+                ]
+            },
+            "stadion": {
+                "type": "object",
+                "title": "Stadion",
+                "description": "Objekt koji sadrži podatke o domaćem stadion kluba.",
+                "required": [
+                    "stadion_naziv",
+                    "stadion_grad",
+                    "stadion_drzava",
+                    "adresa"
+                ],
+                "properties": {
+                    "stadion_naziv": {
+                        "type": "string",
+                        "title": "Naziv stadiona",
+                        "description": "Službeni naziv stadiona.",
+                        "examples": [
+                            "Stadio Giuseppe Meazza"
+                        ]
+                    },
+                    "stadion_grad": {
+                        "type": "string",
+                        "title": "Grad stadiona",
+                        "description": "Grad u kojem se stadion nalazi.",
+                        "examples": [
+                            "Milano"
+                        ]
+                    },
+                    "stadion_drzava": {
+                        "type": "string",
+                        "title": "Država stadiona",
+                        "description": "Država u kojoj se stadion nalazi.",
+                        "examples": [
+                            "Italija"
+                        ]
+                    },
+                    "adresa": {
+                        "type": "string",
+                        "title": "Adresa stadiona",
+                        "description": "Adresa stadiona koja se sastoji od imena ulice, broja ulica i poštanskog broja.",
+                        "examples": [
+                            "Via Piccolomini 5, 20151"
+                        ]
+                    },
+                    "kapacitet": {
+                        "type": "integer",
+                        "title": "Kapacitet stadiona",
+                        "description": "Službeni kapacitet stadiona.",
+                        "examples": [
+                            80018
+                        ]
+                    },
+                    "podloga": {
+                        "type": "string",
+                        "title": "Podloga stadiona",
+                        "description": "Vrsta podloge koja čini teren.",
+                        "examples": [
+                            "hibridna trava"
+                        ]
+                    }
+                }
+            },
+            "igraci": {
+                "type": "array",
+                "title": "Igrači",
+                "description": "Skup igrača.",
+                "items": [{
+                    "type": "object",
+                    "title": "Igrač",
+                    "description": "Objekt koji sadrži podatke o igraču.",
+                    "required": [
+                        "ime",
+                        "prezime",
+                        "datum_rod"
+                    ],
+                    "properties": {
+                        "ime": {
+                            "type": "string",
+                            "title": "Ime",
+                            "description": "Ime igrača.",
+                            "examples": [
+                                "Sandro"
+                            ]
+                        },
+                        "prezime": {
+                            "type": "string",
+                            "title": "Prezime",
+                            "description": "Prezime igrača.",
+                            "examples": [
+                                "Tonali"
+                            ]
+                        },
+                        "igrac_drzava": {
+                            "type": "string",
+                            "title": "Država igrača",
+                            "description": "Država koju igrač predstavlja.",
+                            "examples": [
+                                "Italija"
+                            ]
+                        },
+                        "pozicija": {
+                            "type": "string",
+                            "title": "Pozicija",
+                            "description": "Kratica pozicije koju igrač igra.",
+                            "examples": [
+                                "MF"
+                            ]
+                        },
+                        "datum_rod": {
+                            "type": "string",
+                            "format": "date",
+                            "title": "Datum rođenja",
+                            "description": "Datum rođenja igrača u ISO formatu.",
+                            "examples": [
+                                "2000-05-08"
+                            ]
+                        }
+                    }
+                }]
+
+            }
+        }
+    }]
+}
