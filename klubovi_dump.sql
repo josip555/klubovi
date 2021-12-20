@@ -38,7 +38,6 @@ CREATE TABLE igrac
 	FOREIGN KEY (klub_id) REFERENCES klub(klub_id)
 );
 
-INSERT INTO stadion (stadion_id, stadion_naziv) VALUES (0, 'Nepoznati stadion');
 INSERT INTO stadion (stadion_id, stadion_naziv, stadion_grad, stadion_drzava, adresa, kapacitet, podloga) VALUES 
 (1, 'Stadio Giuseppe Meazza', 'Milano', 'Italija', 'Via Piccolomini 5, 20151', 80018, 'hibridna trava'),
 (2, 'Stadio Olimpico', 'Rim', 'Italija', 'Viale dei Gladiatori, 00135', 72698, 'prirodna trava'),
@@ -50,7 +49,6 @@ INSERT INTO stadion (stadion_id, stadion_naziv, stadion_grad, stadion_drzava, ad
 (8, 'Signal Iduna Park', 'Dortmund', 'Njemačka', 'Strobelallee 50, 44139', 81365, 'prirodna trava');
 
 SET datestyle= 'German, DMY';
-INSERT INTO klub (klub_id, klub_naziv) VALUES (0, 'Nepoznati klub');
 INSERT INTO klub (klub_id, klub_naziv, kratica, nadimak, klub_grad, klub_drzava, osnovan, predsjednik, trener, liga, web, stadion_id) VALUES 
 (1, 'AC Milan', 'MIL', 'I Rossoneri', 'Milano', 'Italija', '16.12.1899', 'Paolo Scaroni', 'Stefano Pioli', 'Serie A', 'https://www.acmilan.com/en', 1),
 (2, 'FC Internazionale Milano', 'INT', 'I Nerazzurri', 'Milano', 'Italija', '09.03.1908', 'Steven Zhang', 'Simone Inzaghi', 'Serie A', 'https://www.inter.it/en', 1),

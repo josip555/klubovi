@@ -1,8 +1,25 @@
 const fs = require('fs');
 const https = require('https');
 const path = require('path');
+const swaggerJsDoc = require('swagger-jsdoc');
+const swaggerUI = require('swagger-ui-express');
 const privateKey = fs.readFileSync('cert/key.pem', 'utf8');
 const certificate = fs.readFileSync('cert/cert.pem', 'utf8');
+
+const swaggerOptions = {
+  swaggerDefinition:{
+    info: {
+      title: 'Nogometni klubovi API',
+      version: '1.0.0'
+    }
+  },
+  apis: ['app.js']
+}
+
+const swaggerDocs = swaggerJsDoc(swaggerOptions);
+
+
+
 const {
   Pool
 } = require('pg')
@@ -30,6 +47,7 @@ app.use(express.json({
 }));
 
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocs));
 
 httpsServer.listen(port);
 console.log(`Listening at port ${port}...`)
@@ -234,6 +252,7 @@ app.get('/allrows', (req, res) => {
     igrac_drzava,
     pozicija,
     datum_rod,
+    igrac.klub_id AS klub_id,
     klub_naziv,
     kratica,
     nadimak,
@@ -244,6 +263,7 @@ app.get('/allrows', (req, res) => {
     trener,
     liga,
     web,
+    klub.stadion_id AS stadion_id,
     stadion_naziv,
     stadion_grad,
     stadion_drzava,
@@ -261,4 +281,365 @@ app.get('/allrows', (req, res) => {
       res.end();
     })
   })
+});
+
+//*******************//
+//  API methods      //
+//*******************//
+
+class ResponseWrapper {
+  constructor(status, message, response) {
+    this.status = status;
+    this.message = message;
+    this.response = response;
+  }
+}
+
+app.get('/openapi', (req, res) => {
+  res.download(path.join(__dirname, 'openapi.json'));
+});
+
+app.get('/clubs', (req, res) => {
+  pool.connect((err, client, release) => {
+    if (err) {
+      return console.error('Error acquiring client', err.stack)
+    }
+    client.query(`SELECT
+    klub_id,
+    klub_naziv,
+    kratica,
+    nadimak,
+    klub_grad,
+    klub_drzava,
+    osnovan,
+    predsjednik,
+    trener,
+    liga,
+    web,
+    stadion_id
+    FROM klub`, (err, result) => {
+      release()
+      if (err) {
+        return console.error('Error executing query', err.stack)
+      }
+      if (result.rows.length == 0) {
+        res.status(404);
+        res.contentType('application/json');
+        res.send(JSON.stringify(new ResponseWrapper('Not Found', 'Clubs not found', null)));
+        res.end();
+        return
+      }
+      res.contentType('application/json');
+      res.send(JSON.stringify(new ResponseWrapper('OK', 'Fetched club objects', result.rows)));
+      console.log(`Clubs sent...`);
+      res.end();
+    })
+  })
+});
+
+app.get('/clubs/:id', (req, res) => {
+  var club_id = req.params.id;
+  pool.connect((err, client, release) => {
+    if (err) {
+      return console.error('Error acquiring client', err.stack)
+    }
+    client.query(`SELECT
+    klub_id,
+    klub_naziv,
+    kratica,
+    nadimak,
+    klub_grad,
+    klub_drzava,
+    osnovan,
+    predsjednik,
+    trener,
+    liga,
+    web,
+    stadion_id
+    FROM klub
+    WHERE klub_id = ${club_id}`, (err, result) => {
+      release()
+      if (err) {
+        res.status(404);
+        res.contentType('application/json');
+        res.send(JSON.stringify(new ResponseWrapper('Not Found', `Club with ID ${club_id} not found`, null)));
+        res.end();
+        return console.error('Error executing query', err.stack)
+      }
+      if (result.rows.length == 0) {
+        res.status(404);
+        res.contentType('application/json');
+        res.send(JSON.stringify(new ResponseWrapper('Not Found', `Club with ID ${club_id} not found`, null)));
+        res.end();
+        return
+      }
+      res.contentType('application/json');
+      res.send(JSON.stringify(new ResponseWrapper('OK', `Fetched club object`, result.rows)));
+      console.log(`Clubs sent...`);
+      res.end();
+    })
+  })
+});
+
+app.get('/players', (req, res) => {
+  pool.connect((err, client, release) => {
+    if (err) {
+      return console.error('Error acquiring client', err.stack)
+    }
+    client.query(`SELECT
+    igrac_id, 
+    ime,
+    prezime,
+    igrac_drzava,
+    pozicija,
+    datum_rod,
+    klub_id
+    FROM igrac`, (err, result) => {
+      release()
+      if (err) {
+        return console.error('Error executing query', err.stack)
+      }
+      if (result.rows.length == 0) {
+        res.status(404);
+        res.contentType('application/json');
+        res.send(JSON.stringify(new ResponseWrapper('Not Found', 'Players not found', null)));
+        res.end();
+        return
+      }
+      res.contentType('application/json');
+      res.send(JSON.stringify(new ResponseWrapper('OK', 'Fetched player objects', result.rows)));
+      console.log(`Players sent...`);
+      res.end();
+    })
+  })
+});
+
+app.get('/players/:id', (req, res) => {
+  var player_id = req.params.id;
+  pool.connect((err, client, release) => {
+    if (err) {
+      return console.error('Error acquiring client', err.stack)
+    }
+    client.query(`SELECT
+    igrac_id, 
+    ime,
+    prezime,
+    igrac_drzava,
+    pozicija,
+    datum_rod,
+    klub_id
+    FROM igrac
+    WHERE igrac_id = ${player_id}`, (err, result) => {
+      release()
+      if (err) {
+        res.status(404);
+        res.contentType('application/json');
+        res.send(JSON.stringify(new ResponseWrapper('Not Found', `Player with ID ${player_id} not found`, null)));
+        res.end();
+        return console.error('Error executing query', err.stack)
+      }
+      if (result.rows.length == 0) {
+        res.status(404);
+        res.contentType('application/json');
+        res.send(JSON.stringify(new ResponseWrapper('Not Found', `Player with ID ${player_id} not found`, null)));
+        res.end();
+        return
+      }
+      res.contentType('application/json');
+      res.send(JSON.stringify(new ResponseWrapper('OK', 'Fetched player object', result.rows)));
+      console.log(`Players sent...`);
+      res.end();
+    })
+  })
+});
+
+app.get('/stadiums', (req, res) => {
+  pool.connect((err, client, release) => {
+    if (err) {
+      return console.error('Error acquiring client', err.stack)
+    }
+    client.query(`SELECT 
+    stadion_id,
+    stadion_naziv,
+    stadion_grad,
+    stadion_drzava,
+    adresa,
+    kapacitet,
+    podloga
+    FROM stadion`, (err, result) => {
+      release()
+      if (err) {
+        return console.error('Error executing query', err.stack)
+      }
+      if (result.rows.length == 0) {
+        res.status(404);
+        res.contentType('application/json');
+        res.send(JSON.stringify(new ResponseWrapper('Not Found', 'Stadiums not found', null)));
+        res.end();
+        return
+      }
+      res.contentType('application/json');
+      res.send(JSON.stringify(new ResponseWrapper('OK', 'Fetched stadium objects', result.rows)));
+      console.log(`Stadiums sent...`);
+      res.end();
+    })
+  })
+});
+
+app.get('/stadiums/:id', (req, res) => {
+  var stadium_id = req.params.id;
+  pool.connect((err, client, release) => {
+    if (err) {
+      res.status(404);
+      res.contentType('application/json');
+      res.send(JSON.stringify(new ResponseWrapper('Not Found', `Stadium with ID ${stadium_id} not found`, null)));
+      res.end();
+      return console.error('Error acquiring client', err.stack)
+    }
+    client.query(`SELECT 
+    stadion_id,
+    stadion_naziv,
+    stadion_grad,
+    stadion_drzava,
+    adresa,
+    kapacitet,
+    podloga
+    FROM stadion
+    WHERE stadion_id = ${stadium_id}`, (err, result) => {
+      release()
+      if (err) {
+        return console.error('Error executing query', err.stack)
+      }
+      if (result.rows.length == 0) {
+        res.status(404);
+        res.contentType('application/json');
+        res.send(JSON.stringify(new ResponseWrapper('Not Found', `Stadium with ID ${stadium_id} not found`, null)));
+        res.end();
+        return
+      }
+      res.contentType('application/json');
+      res.send(JSON.stringify(new ResponseWrapper('OK', 'Fetched stadium object', result.rows)));
+      console.log(`Stadium sent...`);
+      res.end();
+    })
+  })
+});
+
+app.post('/stadiums', (req, res) => {
+  pool.connect((err, client, release) => {
+    if (err) {
+      return console.error('Error acquiring client', err.stack)
+    }
+
+    client.query(`INSERT INTO stadion VALUES (
+      ${req.body.stadion_id}, '${req.body.stadion_naziv}', '${req.body.stadion_grad}', 
+      '${req.body.stadion_drzava}', '${req.body.adresa}', ${req.body.kapacitet}, '${req.body.podloga}');`, (err, result) => {
+      release()
+      if (err) {
+        if (err.message.startsWith("duplicate key value")) {
+          res.status(409);
+          res.contentType('application/json');
+          res.location(`stadiums/${req.body.stadion_id}`);
+          res.send(JSON.stringify(new ResponseWrapper('Conflict', `Stadium with ID ${req.body.stadion_id} already exists`, null)));
+          res.end();
+          return
+        }
+
+        res.status(400);
+        res.contentType('application/json');
+        res.send(JSON.stringify(new ResponseWrapper('Bad Request', `Invalid request body parameters`, null)));
+        res.end();
+        return console.error('Error executing query', err.message)
+      }
+      res.status(201);
+      res.contentType('application/json');
+      res.location(`stadiums/${req.body.stadion_id}`);
+      res.send(JSON.stringify(new ResponseWrapper('Created', 'Stadium object created', null)));
+      console.log(`Stadium object created...`);
+      res.end();
+    })
+  })
+});
+
+app.put('/stadiums/:id', (req, res) => {
+  var stadium_id = req.params.id;
+  pool.connect((err, client, release) => {
+    if (err) {
+      return console.error('Error acquiring client', err.stack)
+    }
+
+    var query = 'UPDATE SET ';
+    if (req.body.stadion_naziv) query += 'stadion_naziv = ' + "'" + req.body.stadion_naziv + "',";
+    if (req.body.stadion_grad) query += 'stadion_grad = ' + "'" + req.body.stadion_grad + "',";
+    if (req.body.stadion_drzava) query += 'stadion_drzava = ' + "'" + req.body.stadion_drzava + "',";
+    if (req.body.adresa) query += 'adresa = ' + "'" + req.body.adresa + "',";
+    if (req.body.kapacitet) query += 'kapacitet = ' + req.body.kapacitet + ",";
+    if (req.body.podloga) query += 'podloga =' + "'" + req.body.podloga + "',";
+    query = query.slice(0, -1) + ';';
+    console.log(query);
+
+    client.query(`SELECT stadion_id FROM stadion WHERE stadion_id = ${stadium_id}; INSERT INTO stadion VALUES (
+      ${stadium_id}, '${req.body.stadion_naziv}', '${req.body.stadion_grad}', 
+      '${req.body.stadion_drzava}', '${req.body.adresa}', ${req.body.kapacitet?req.body.kapacitet:"0"}, '${req.body.podloga}')
+      ON CONFLICT (stadion_id)
+      DO ${query}`, (err, result) => {
+      release()
+      if (err) {
+        res.status(400);
+        res.contentType('application/json');
+        res.send(JSON.stringify(new ResponseWrapper('Bad Request', `Invalid request body parameters`, null)));
+        res.end();
+        return console.error('Error executing query', err.message)
+      }
+      if(result[0].rows.length > 0){
+        res.status(200);
+        res.contentType('application/json');
+        res.location(`stadiums/${req.body.stadion_id}`);
+        res.send(JSON.stringify(new ResponseWrapper('OK', 'Stadium object updated', null)));
+        console.log(`Stadium object created...`);
+        res.end();
+      }
+      res.status(201);
+      res.contentType('application/json');
+      res.location(`stadiums/${req.body.stadion_id}`);
+      res.send(JSON.stringify(new ResponseWrapper('Created', 'Stadium object created', null)));
+      console.log(`Stadium object created...`);
+      res.end();
+    })
+  })
+});
+
+app.delete('/stadiums/:id', (req, res) => {
+  var stadium_id = req.params.id;
+  pool.connect((err, client, release) => {
+    if (err) {
+      return console.error('Error acquiring client', err.stack)
+    }
+    client.query(`DELETE FROM stadion
+    WHERE stadion_id = ${stadium_id}`, (err, result) => {
+      release()
+      if (err) {
+        return console.error('Error executing query', err.stack)
+      }
+      if (result.rowCount == 0) {
+        res.status(404);
+        res.contentType('application/json');
+        res.send(JSON.stringify(new ResponseWrapper('Not Found', `Stadium with ID ${stadium_id} not found`, null)));
+        res.end();
+        return
+      }
+      res.contentType('application/json');
+      res.send(JSON.stringify(new ResponseWrapper('OK', 'Deleted stadium object', null)));
+      console.log(`Stadium sent...`);
+      res.end();
+    })
+  })
+});
+
+// Handle 404/501 - Keep this as a last route
+app.use(function (req, res, next) {
+  res.status(501);
+  res.contentType('application/json');
+  res.send(JSON.stringify(new ResponseWrapper('Not Implemented', `Method not implemented for requested resource`, null)));
+  res.end();
 });

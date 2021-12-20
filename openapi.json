@@ -1,0 +1,252 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "info": "Nogometni klubovi API",
+        "version": "1.3",
+        "contact": {
+            "email": "josip@mail.com"
+        },
+        "license": {
+            "name": "MIT License",
+            "url": "https://opensource.org/licenses/MIT"
+        }
+    },
+    "paths": {
+        "/clubs": {
+            "get": {
+                "summary": "Get all club objects",
+                "description": "Returns a list of club objects",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Fetched club objects",
+                        "schema": {
+                            "$ref": "#/schemas/ResponseWrapper"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/clubs/{id}": {
+            "get": {
+                "summary": "Get club from collection using ID",
+                "description": "Returns club object",
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "id",
+                    "required": true,
+                    "style": "simple",
+                    "schema": {
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                }],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Fetched club object",
+                        "schema": {
+                            "$ref": "#/schemas/ResponseWrapper"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/players": {
+            "get": {
+                "summary": "Get all player objects",
+                "description": "Returns a list of player objects",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Fetched player objects",
+                        "schema": {
+                            "$ref": "#/schemas/ResponseWrapper"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/players/{id}": {
+            "get": {
+                "summary": "Get player from collection using ID",
+                "description": "Returns player object",
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "id",
+                    "required": true,
+                    "style": "simple",
+                    "schema": {
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                }],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Fetched player object",
+                        "schema": {
+                            "$ref": "#/schemas/ResponseWrapper"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/stadiums": {
+            "get": {
+                "summary": "Get all stadium objects",
+                "description": "Returns a list of stadium objects",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Fetched stadium objects",
+                        "schema": {
+                            "$ref": "#/schemas/ResponseWrapper"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Save a stadium to collection",
+                "description": "Saves stadium to collection",
+                "produces": [
+                    "application/json"
+                ],
+                "requestBody": {
+                    "schema": {
+                        "$ref": "#/schemas/Stadium"
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "409": {
+                        "description": "Conflict"
+                    }
+                }
+            }
+        },
+        "/stadiums/{id}": {
+            "get": {
+                "summary": "Get stadium from collection using ID",
+                "description": "Returns stadium object",
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "id",
+                    "required": true,
+                    "style": "simple",
+                    "schema": {
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                }],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Fetched stadium object",
+                        "schema": {
+                            "$ref": "#/schemas/ResponseWrapper"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            },
+            "put": {
+                "summary": "Update stadium provided by ID",
+                "description": "Update stadium",
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "id",
+                    "required": true,
+                    "style": "simple",
+                    "schema": {
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                }],
+                "produces": [
+                    "application/json"
+                ],
+                "requestBody": {
+                    "schema": {
+                        "$ref": "#/schemas/Stadium"
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete stadium provided by ID",
+                "description": "Delete stadium",
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "id",
+                    "required": true,
+                    "style": "simple",
+                    "schema": {
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                }],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        }
+    }
+}

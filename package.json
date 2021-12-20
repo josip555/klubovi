@@ -19,6 +19,9 @@
   "homepage": "https://github.com/josip555/klubovi#readme",
   "dependencies": {
     "express": "^4.17.1",
-    "pg": "^8.7.1"
+    "pg": "^8.7.1",
+    "nodemon": "*",
+    "swagger-jsdoc": "*",
+    "swagger-ui-express": "*"
   }
 }

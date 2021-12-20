@@ -33,12 +33,12 @@ $(document).ready(function () {
                 render: function (data) {
                     return (new Date(data)).toLocaleDateString();
                 }
-            },
+            }/*,
             {
                 targets: [0],
                 visible: false,
                 searchable: false
-            }
+            }*/
         ],
         columns: [{
                 'data': 'igrac_id'
@@ -57,6 +57,9 @@ $(document).ready(function () {
             },
             {
                 'data': 'datum_rod'
+            },
+            {
+                'data': 'klub_id'
             },
             {
                 'data': 'klub_naziv'
@@ -87,6 +90,9 @@ $(document).ready(function () {
             },
             {
                 'data': 'web'
+            },
+            {
+                'data': 'stadion_id'
             },
             {
                 'data': 'stadion_naziv'
