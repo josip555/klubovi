@@ -598,6 +598,7 @@ app.put('/stadiums/:id', (req, res) => {
         res.send(JSON.stringify(new ResponseWrapper('OK', 'Stadium object updated', null)));
         console.log(`Stadium object created...`);
         res.end();
+        return;
       }
       res.status(201);
       res.contentType('application/json');
