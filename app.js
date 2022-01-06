@@ -7,7 +7,7 @@ const privateKey = fs.readFileSync('cert/key.pem', 'utf8');
 const certificate = fs.readFileSync('cert/cert.pem', 'utf8');
 
 const swaggerOptions = {
-  swaggerDefinition:{
+  swaggerDefinition: {
     info: {
       title: 'Nogometni klubovi API',
       version: '1.0.0'
@@ -46,6 +46,48 @@ app.use(express.json({
   limit: '10mb'
 }));
 
+const {
+  auth
+} = require('express-openid-connect');
+
+const config = {
+  authRequired: false,
+  auth0Logout: true,
+  secret: 'hsagfaufhUFHADKFGKAHFBJKAHGDASjdshhakd',
+  baseURL: 'https://localhost:3000',
+  clientID: 'pz58GoaNV8EBCNyQnXvISujyDkj4Wt3G',
+  issuerBaseURL: 'https://dev-t4jg0c7t.eu.auth0.com'
+};
+
+// auth router attaches /login, /logout, and /callback routes to the baseURL
+app.use(auth(config));
+
+// req.isAuthenticated is provided from the auth router
+/*app.get('/', (req, res) => {
+  res.send(req.oidc.isAuthenticated() ? 'Logged in' : 'Logged out');
+});*/
+
+const {
+  requiresAuth
+} = require('express-openid-connect');
+
+app.get('/profile', requiresAuth(), (req, res) => {
+  res.send(JSON.stringify(req.oidc.user));
+});
+
+app.get('/profile.html', requiresAuth(), (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'profile.html'));
+});
+
+app.get('/authenticated', (req, res) => {
+  res.send(JSON.stringify(req.oidc.isAuthenticated()));
+});
+
+app.get('/signout', (req, res) => {
+  req.oidc.isAuthenticated = false;
+  res.end();
+})
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocs));
 
@@ -53,51 +95,22 @@ httpsServer.listen(port);
 console.log(`Listening at port ${port}...`)
 
 app.get('/download/csv', (req, res) => {
-  pool.connect((err, client, release) => {
-    if (err) {
-      return console.error('Error acquiring client', err.stack)
-    }
-    client.query(`COPY(SELECT
-        klub_naziv,
-        kratica,
-        nadimak,
-        klub_grad,
-        klub_drzava,
-        osnovan,
-        predsjednik,
-        trener,
-        liga,
-        web,
-        stadion_naziv,
-        stadion_grad,
-        stadion_drzava,
-        adresa,
-        kapacitet,
-        podloga,
-        ime,
-        prezime,
-        igrac_drzava,
-        pozicija,
-        datum_rod
-      FROM klub JOIN stadion ON klub.stadion_id=stadion.stadion_id 
-        JOIN igrac ON igrac.klub_id=klub.klub_id)
-    TO '${path.join(__dirname, 'klubovi.csv')}' with DELIMITER ',' CSV HEADER;`, (err, result) => {
-      release()
-      if (err) {
-        return console.error('Error executing query', err.stack)
-      }
-      res.download(path.join(__dirname, 'klubovi.csv'));
-      console.log(`CSV sent...`);
-    })
-  })
+  res.download(path.join(__dirname, 'klubovi.csv'));
+  console.log(`CSV sent...`);
 });
 
 app.get('/download/json', (req, res) => {
+  res.download(path.join(__dirname, 'klubovi.json'));
+  console.log(`JSON sent...`);
+});
+
+app.get('/download/refresh', requiresAuth(), (req, res) => {
   pool.connect((err, client, release) => {
     if (err) {
       return console.error('Error acquiring client', err.stack)
     }
-    client.query(`COPY (
+    client.query(`
+    COPY (
       SELECT to_json(array_agg(t)) FROM (
           SELECT 
             klub_naziv AS klub_naziv,
@@ -111,6 +124,7 @@ app.get('/download/json', (req, res) => {
             liga,
             web,
             json_build_object(
+              '@context'::text, json_build_object('@vocab'::text, 'http://schema.org/'::text, 'stadion_naziv'::text, 'name'::text, 'stadion_drzava'::text, 'addressCountry'::text),
               'stadion_naziv', stadion.stadion_naziv,
               'stadion_grad', stadion.stadion_grad,
               'stadion_drzava', stadion.stadion_drzava,
@@ -119,6 +133,7 @@ app.get('/download/json', (req, res) => {
               'podloga', stadion.podloga) AS stadion,
             json_agg(
               json_build_object(
+                '@context'::text, json_build_object('@vocab'::text, 'http://schema.org/'::text, 'ime'::text, 'givenName'::text, 'prezime'::text, 'familyName'::text),
                 'ime', igrac.ime,
                 'prezime', igrac.prezime,
                 'igrac_drzava', igrac.igrac_drzava,
@@ -130,13 +145,38 @@ app.get('/download/json', (req, res) => {
           GROUP BY klub.klub_id, stadion.stadion_id
           ORDER BY klub.klub_id::int
           ) t )
-    TO '${path.join(__dirname, 'klubovi.json')}';`, (err, result) => {
+    TO '${path.join(__dirname, 'klubovi.json')}';
+    COPY(SELECT
+      klub_naziv,
+      kratica,
+      nadimak,
+      klub_grad,
+      klub_drzava,
+      osnovan,
+      predsjednik,
+      trener,
+      liga,
+      web,
+      stadion_naziv,
+      stadion_grad,
+      stadion_drzava,
+      adresa,
+      kapacitet,
+      podloga,
+      ime,
+      prezime,
+      igrac_drzava,
+      pozicija,
+      datum_rod
+    FROM klub JOIN stadion ON klub.stadion_id=stadion.stadion_id 
+      JOIN igrac ON igrac.klub_id=klub.klub_id)
+  TO '${path.join(__dirname, 'klubovi.csv')}' with DELIMITER ',' CSV HEADER;`, (err, result) => {
       release()
       if (err) {
         return console.error('Error executing query', err.stack)
       }
-      res.download(path.join(__dirname, 'klubovi.json'));
-      console.log(`JSON sent...`);
+      res.send('<script> alert("CSV i JSON izvozi podataka osvježeni."); window.location.href = "/"; </script>');
+      console.log(`JSON and CSV refreshed...`);
     })
   })
 });
@@ -526,6 +566,7 @@ app.get('/stadiums/:id', (req, res) => {
 });
 
 app.post('/stadiums', (req, res) => {
+  res.contentType('application/json');
   pool.connect((err, client, release) => {
     if (err) {
       return console.error('Error acquiring client', err.stack)
@@ -538,7 +579,6 @@ app.post('/stadiums', (req, res) => {
       if (err) {
         if (err.message.startsWith("duplicate key value")) {
           res.status(409);
-          res.contentType('application/json');
           res.location(`stadiums/${req.body.stadion_id}`);
           res.send(JSON.stringify(new ResponseWrapper('Conflict', `Stadium with ID ${req.body.stadion_id} already exists`, null)));
           res.end();
@@ -546,13 +586,11 @@ app.post('/stadiums', (req, res) => {
         }
 
         res.status(400);
-        res.contentType('application/json');
         res.send(JSON.stringify(new ResponseWrapper('Bad Request', `Invalid request body parameters`, null)));
         res.end();
         return console.error('Error executing query', err.message)
       }
       res.status(201);
-      res.contentType('application/json');
       res.location(`stadiums/${req.body.stadion_id}`);
       res.send(JSON.stringify(new ResponseWrapper('Created', 'Stadium object created', null)));
       console.log(`Stadium object created...`);
@@ -591,7 +629,7 @@ app.put('/stadiums/:id', (req, res) => {
         res.end();
         return console.error('Error executing query', err.message)
       }
-      if(result[0].rows.length > 0){
+      if (result[0].rows.length > 0) {
         res.status(200);
         res.contentType('application/json');
         res.location(`stadiums/${req.body.stadion_id}`);
